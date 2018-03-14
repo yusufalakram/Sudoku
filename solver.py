@@ -36,8 +36,7 @@ def sudoku_solver(sudoku):
     try:
         x, y = findBlankSpace(sudoku)
     # If no blank spots are found, its solved!
-    except ValueError:
-        print("** SOLVED **")
+    except noBlanksFound:
         return sudoku
 
     # Store the original value of this blank spot
@@ -51,21 +50,23 @@ def sudoku_solver(sudoku):
 
     # If no solutions are found, raise exception so you can back track
     if not possibleSolutions:
-        raise ValueError('No Solution Found')
+        raise noSolutionFound()
 
     # Keep copy of current board on recursive stack
-    sudoku_copy = np.copy(sudoku)
+    sudokuCopy = np.copy(sudoku)
 
     # Try all possible solutions, backtracking where necessary
     for value in possibleSolutions:
         try:
-            print("TRY", value, "FOR [ x:", x, "|", "y:", y, "] FROM:", possibleSolutions)
-            sudoku_copy[y, x] = value
-            sudoku_solver(sudoku_copy)
-        except ValueError:
-            print("failed")
-            sudoku_copy[y, x] = originalValue
+            # print("TRY", value, "FOR [ x:", x, "|", "y:", y, "] FROM:", possibleSolutions)
+            sudokuCopy[y, x] = value
+            return sudoku_solver(sudokuCopy)
+        except noSolutionFound:
+            # print("failed")
+            sudokuCopy[y, x] = originalValue
             continue
+
+    raise noSolutionFound()
 
 
 def findBlankSpace(sudoku):
@@ -74,7 +75,15 @@ def findBlankSpace(sudoku):
         for x in range(width):
             if sudoku[y,x] == 0:
                 return x, y
-    raise ValueError('No blank space found')
+    raise noBlanksFound('No blank space found')
+
+
+class noBlanksFound(Exception):
+    pass
+
+
+class noSolutionFound(Exception):
+    pass
 
 
 def isPossibleSolution(sudoku, value, xCoord, yCoord):
