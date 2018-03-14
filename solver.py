@@ -48,6 +48,16 @@ def sudoku_solver(sudoku):
         if isPossibleSolution(sudoku, value, x, y):
             possibleSolutions.append(value)
 
+    for value in possibleSolutions:
+        print("TRY", value, "FOR [ x:", x, "|", "y:", y, "] FROM:", possibleSolutions)
+        sudoku[y, x] = value
+        if hasSolutions(sudoku):
+            sudoku_solver(sudoku)
+        else:
+            print("FAIL")
+            sudoku[y, x] = originalValue
+
+    """
     # If no solutions are found, raise exception so you can back track
     if not possibleSolutions:
         raise ValueError('No Solution Found')
@@ -62,7 +72,26 @@ def sudoku_solver(sudoku):
             print("failed")
             sudoku[y, x] = originalValue
             continue
+    """
 
+def hasSolutions(sudoku):
+    # Find a blank spot to fill
+    try:
+        x, y = findBlankSpace(sudoku)
+    # If no blank spots are found, its solved!
+    except ValueError:
+        return True
+
+    # Store all possible solutions for this blank spot
+    possibleSolutions = []
+    for value in range(1,10):
+        if isPossibleSolution(sudoku, value, x, y):
+            possibleSolutions.append(value)
+
+    if not possibleSolutions:
+        return False
+    else:
+        return True
 
 def findBlankSpace(sudoku):
     height, width = np.shape(sudoku)
